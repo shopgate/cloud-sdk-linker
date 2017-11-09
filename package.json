@@ -1,0 +1,55 @@
+{
+  "name": "@shopgate/dependency-linker",
+  "version": "0.0.1",
+  "description": "Shopgate's Dependency Linker",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha --recursive test",
+    "cover": "nyc mocha --recursive test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shopgate/dependency-linker.git"
+  },
+  "bin": {
+    "link-dependencies": "./bin/link-dependencies"
+  },
+  "keywords": [
+    "shopgate",
+    "dependency",
+    "linker",
+    "node",
+    "npm"
+  ],
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/shopgate/dependency-linker/issues"
+  },
+  "homepage": "https://github.com/shopgate/dependency-linker#readme",
+  "devDependencies": {
+    "@shopgate/eslint-config": "^1.0.2",
+    "mocha": "^4.0.1",
+    "nyc": "^11.3.0",
+    "rimraf": "^2.6.2",
+    "sinon": "^4.1.2"
+  },
+  "engines": {
+    "node": ">= 8.0.0",
+    "npm": ">= 5.0.0"
+  },
+  "nyc": {
+    "include": [
+      "**/*.js"
+    ],
+    "exclude": [
+      "build",
+      "test"
+    ],
+    "reporter": [
+      "lcov",
+      "text-summary"
+    ],
+    "all": true,
+    "report-dir": "build"
+  }
+}
