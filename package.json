@@ -19,6 +19,9 @@
     "node",
     "npm"
   ],
+  "contributors": [
+    "Frithjof Klös <frithjof.kloes@shopgate.com> (https://github.com/kernelkiller)"
+  ],
   "bin": {
     "link-dependencies": "./bin/link-dependencies"
   },
