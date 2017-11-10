@@ -3,17 +3,15 @@
   "version": "0.0.1",
   "description": "Shopgate's Dependency Linker",
   "main": "index.js",
-  "scripts": {
-    "test": "mocha --recursive test",
-    "cover": "nyc mocha --recursive test"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/shopgate/dependency-linker.git"
   },
-  "bin": {
-    "link-dependencies": "./bin/link-dependencies"
+  "bugs": {
+    "url": "https://github.com/shopgate/dependency-linker/issues"
   },
+  "homepage": "https://github.com/shopgate/dependency-linker",
+  "license": "Apache-2.0",
   "keywords": [
     "shopgate",
     "dependency",
@@ -21,11 +19,14 @@
     "node",
     "npm"
   ],
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/shopgate/dependency-linker/issues"
+  "bin": {
+    "link-dependencies": "./bin/link-dependencies"
   },
-  "homepage": "https://github.com/shopgate/dependency-linker#readme",
+  "scripts": {
+    "test": "mocha test/**/*",
+    "test:watch": "mocha --watch test/**/*",
+    "cover": "nyc mocha test/**/*"
+  },
   "devDependencies": {
     "@shopgate/eslint-config": "^1.0.2",
     "mocha": "^4.0.1",
@@ -43,7 +44,8 @@
     ],
     "exclude": [
       "build",
-      "test"
+      "test",
+      "dist"
     ],
     "reporter": [
       "lcov",
