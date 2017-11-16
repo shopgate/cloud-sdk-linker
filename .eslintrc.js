@@ -5,6 +5,11 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-module.exports = {
-  extends: '@shopgate/eslint-config',
-};
+ module.exports = {
+   extends: '@shopgate/eslint-config',
+   settings: {
+     'import/resolver': {
+       'babel-module': {},
+     },
+   },
+ };
