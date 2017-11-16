@@ -3,7 +3,7 @@
 ## Installation
 
 ```
-npm i -g @shopgate/dependency-link
+npm i -g @shopgate/dependency-linker
 ```
 
 ## About Shopgate
