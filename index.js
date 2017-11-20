@@ -8,7 +8,4 @@
 const DependencyLinker = require('./lib/DependencyLinker').default;
 
 const dependencyLinker = new DependencyLinker();
-
-dependencyLinker
-  .init()
-  .link();
+dependencyLinker.link();

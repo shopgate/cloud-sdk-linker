@@ -25,36 +25,10 @@ class DependencyLinker {
    * Constructor of the DependencyLinker
    */
   constructor() {
-    this.packages = [];
-    this.linkableDependencies = [];
-  }
-
-  /**
-   * Initializes the dependency linker.
-   * @param {Object} options The options of the linker.
-   * @return {DependencyLinker}
-   */
-  init(options) {
-    const { theme } = options || {};
-
     const packageCollector = new PackageCollector();
-    let packages;
 
-    if (theme) {
-      // Link only the theme that was requested.
-      packages = packageCollector
-        .get(THEMES_FOLDER)
-        .filter(({ name }) => name.endsWith(`theme-${theme}`));
-    } else {
-      // Link everything that's possible if no option was set.
-      packages = packageCollector
-        .get([THEMES_FOLDER, EXTENSIONS_FOLDER, PWA_FOLDER]);
-    }
-
-    this.packages = packages;
+    this.packages = packageCollector.get([THEMES_FOLDER, EXTENSIONS_FOLDER, PWA_FOLDER]);
     this.linkableDependencies = packageCollector.get(PWA_FOLDER);
-
-    return this;
   }
 
   /**
@@ -64,10 +38,8 @@ class DependencyLinker {
   link() {
     logger.logLinkingStarted();
 
-    let tasks = [...this.packages];
-
     // Add the linkable dependencies to the tasks and remove tasks without dependencies.
-    tasks = tasks.map((task) => {
+    const tasks = this.packages.map((task) => {
       const packageParser = new PackageParser();
       const dependencies = packageParser
         .parse(task.path)
@@ -80,14 +52,10 @@ class DependencyLinker {
       };
     }).filter(({ dependencies }) => dependencies.length > 0);
 
-    let dependencyPaths = [];
-
     // Collect the paths of all linkable dependencies from the tasks.
-    tasks.forEach(({ dependencies }) => {
-      const paths = dependencies.map(({ path }) => path);
-
-      dependencyPaths = dependencyPaths.concat(paths);
-    });
+    let dependencyPaths = [].concat(...tasks.map(({ dependencies }) =>
+      dependencies.map(({ path }) => path)
+    ));
 
     // Make the path entries unique.
     dependencyPaths = [...new Set(dependencyPaths)];
@@ -95,13 +63,15 @@ class DependencyLinker {
     if (dependencyPaths.length === 0) {
       // If there are no linkable packages, end this routine.
       logger.log(`${red('✗')} ${bold('Nothing to link')}.\n`);
-      logger.log(`Make sure you execute the linker within the root of your project folder\nand that you checked out your linkable dependencies within the "${green(PWA_FOLDER)}" folder!`);
+
+      logger.log('Make sure you execute the linker within the root of your project folder');
+      logger.log(`and that you checked out your linkable dependencies within the "${green(PWA_FOLDER)}" folder!`);
       logger.logLinkingFinished();
 
       return this;
     }
 
-    logger.log(`${bold(dependencyPaths.length)} linkable dependencies within ${bold(tasks.length)} packages found. Please wait ... \n`);
+    logger.log(`${bold(dependencyPaths.length)} linkable dependencies within ${bold(tasks.length)} packages found. Please wait ...\n`);
 
     // Link all linkable packages to the global modules.
     dependencyPaths.forEach((path) => {
@@ -134,7 +104,7 @@ class DependencyLinker {
    * @param {boolean} [silent=false] Tells of the stdout shall be suppressed.
    * @return {Buffer|string} The stdout from the command.
    */
-  exec = (cmd, cwd, silent = false) => execSync(cmd, {
+  exec = (cmd, cwd = null, silent = false) => execSync(cmd, {
     ...cwd && { cwd },
     stdio: silent ? '' : 'inherit',
   });

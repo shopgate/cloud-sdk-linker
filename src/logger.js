@@ -7,6 +7,8 @@
 
 import { green, blue } from 'chalk';
 
+const logger = console;
+
 /**
  * The Logger class hold static functions for logging useful information when running
  * the Rapid Dev Server and the Webpack Dev Server.
@@ -30,9 +32,7 @@ class LogHelper {
    * @return {LogHelper}
    */
   log(message) {
-    /* eslint-disable no-console */
-    console.log(message);
-    /* eslint-enable no-console */
+    logger.log(message);
     return this;
   }
 

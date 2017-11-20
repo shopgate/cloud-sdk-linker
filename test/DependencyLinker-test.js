@@ -15,6 +15,27 @@ const THEMES_FOLDER = join(__dirname, 'mocks/themes');
 const EXTENSIONS_FOLDER = join(__dirname, 'mocks/extensions');
 const PWA_FOLDER = join(__dirname, 'mocks/pwa');
 
+const EMPTY_FOLDER = join(__dirname, 'mocks/empty');
+
+let execSpy;
+
+/**
+ * Creates a new DependencyLinker instance and adds a spy to the exec method.
+ * @param {Object} [constants={}] Values for the constant mocks.
+ * @return {Object}
+ */
+const createInstance = (constants = {}) => {
+  const DependencyLinker = proxyquire('../src/DependencyLinker', {
+    './constants': constants,
+  }).default;
+
+  const dependencyLinker = new DependencyLinker();
+
+  execSpy = sinon.spy(dependencyLinker, 'exec');
+
+  return dependencyLinker;
+}
+
 describe('DependencyLinker', () => {
   let DependencyLinker;
   let dependencyLinker;
@@ -22,20 +43,10 @@ describe('DependencyLinker', () => {
   let execSyncStub;
   let logStub;
 
-  let execSpy;
-
   before(() => {
     // Replace the logger for this test, since logs are not that relevant here.
     logStub = sinon.stub(logger, 'log');
     execSyncStub = sinon.stub(childProcess, 'execSync');
-
-    DependencyLinker = proxyquire('../src/DependencyLinker', {
-      './constants': {
-        THEMES_FOLDER,
-        EXTENSIONS_FOLDER,
-        PWA_FOLDER,
-      },
-    }).default;
   });
 
   after(() => {
@@ -44,21 +55,19 @@ describe('DependencyLinker', () => {
     execSyncStub.restore();
   });
 
-  beforeEach(() => {
-    // Create a fresh instance for every test.
-    dependencyLinker = new DependencyLinker();
-    execSpy = sinon.spy(dependencyLinker, 'exec');
-  });
-
   afterEach(() => {
     // Reset the log stub to enable proper counting of the calls within the modules.
     logStub.reset();
   });
 
-  it('should link everything without options', () => {
-    dependencyLinker
-      .init()
-      .link();
+  it('should link everything', () => {
+    const dependencyLinker = createInstance({
+      THEMES_FOLDER,
+      EXTENSIONS_FOLDER,
+      PWA_FOLDER,
+    });
+
+    dependencyLinker.link();
 
     sinon.assert.callCount(execSpy, 17);
     sinon.assert.callOrder(
@@ -84,33 +93,18 @@ describe('DependencyLinker', () => {
     sinon.assert.callCount(logStub, 35);
   });
 
-  it('should only link dependencies to the theme when option is set', () => {
-    const options = {
-      theme: 'ios11',
-    };
-
-    dependencyLinker
-      .init(options)
-      .link();
-
-    sinon.assert.callCount(execSpy, 6);
-    sinon.assert.callOrder(
-      execSpy.withArgs('npm link', join(PWA_FOLDER, 'pwa-common')),
-      execSpy.withArgs('npm link', join(PWA_FOLDER, 'pwa-core')),
-      execSpy.withArgs('npm link', join(PWA_FOLDER, 'eslint-config')),
-      execSpy.withArgs('npm link @shopgate/pwa-common', join(THEMES_FOLDER, 'theme-ios11'), true),
-      execSpy.withArgs('npm link @shopgate/pwa-core', join(THEMES_FOLDER, 'theme-ios11'), true),
-      execSpy.withArgs('npm link @shopgate/eslint-config', join(THEMES_FOLDER, 'theme-ios11'), true)
-    );
-
-    sinon.assert.callCount(logStub, 11);
-  });
-
   it('should link nothing if no packages are set', () => {
+    // Use an empty folder for dependency sources
+    const dependencyLinker = createInstance({
+      THEMES_FOLDER,
+      EXTENSIONS_FOLDER: EMPTY_FOLDER,
+      PWA_FOLDER: EMPTY_FOLDER,
+    });
+
     dependencyLinker
       .link();
 
     sinon.assert.callCount(execSpy, 0);
-    sinon.assert.callCount(logStub, 4);
+    sinon.assert.callCount(logStub, 5);
   });
 });

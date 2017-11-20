@@ -25,21 +25,19 @@ class PackageCollector {
    * @return {Array} The available packages.
    */
   get(paths = []) {
-    const sanitizedPaths = typeof paths === 'string' ? [paths] : paths;
-
+    const sanitizedPaths = (typeof paths === 'string' ? [paths] : paths);
     let packagePaths = [];
 
     // Collect all directories which might contain packages.
     sanitizedPaths.forEach((path) => {
-      let subDirs;
+      let subDirs = this.getSubDirectories(path);
+
       if (path.split('/').includes(EXTENSIONS_FOLDER)) {
         /**
-         * Special treatment for the the "extensions" folder,
+         * Special treatment for the "extensions" folder,
          * since it's structure differs from other folders.
          */
         subDirs = this.findSubDirectories(path, EXTENSIONS_FOLDER_FRONTEND);
-      } else {
-        subDirs = this.getSubDirectories(path);
       }
 
       packagePaths = packagePaths.concat(subDirs);

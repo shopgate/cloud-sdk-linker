@@ -50,7 +50,7 @@ class PackageParser {
 
   /**
    * Sets a list of packages for dependency linking.
-   * @param {Array} [packages] The linkable packages.
+   * @param {Array} packages The linkable packages.
    * @return {PackageParser}
    */
   setLinkableDependencies(packages) {
@@ -68,21 +68,12 @@ class PackageParser {
      * @param {Object} [source={}] The dependency source.
      * @return {Object}
      */
-    const filterDependencies = (source = {}) => {
-      const result = [];
+    const filterDependencies = (source = {}) => Object.keys(source).map((name) => {
+      const dependency = this.linkableDependencies
+        .find(linkableDependency => name === linkableDependency.name);
 
-      // Loop through the package dependencies and filter those, which are available for linking.
-      Object.keys(source).forEach((name) => {
-        const dependency = this.linkableDependencies
-          .find(linkableDependency => name === linkableDependency.name);
-
-        if (dependency) {
-          result.push(dependency);
-        }
-      });
-
-      return result;
-    };
+      return dependency || false;
+    }).filter(entry => entry !== false);
 
     if (this.content === null) {
       throw new Error('PackageParser not initialized');
